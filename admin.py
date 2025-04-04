@@ -12,11 +12,14 @@ import firebase_admin
 from firebase_admin import credentials, firestore, auth
 from datetime import datetime
 import json
-# Load secret Firebase credentials from Streamlit secrets
-firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
-cred = credentials.Certificate(json.loads(firebase_json))
-firebase_admin.initialize_app(cred)
 
+# Check if Firebase is already initialized
+if not firebase_admin._apps:
+    # Load secret Firebase credentials from Streamlit secrets
+    firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
+    cred = credentials.Certificate(json.loads(firebase_json))
+    firebase_admin.initialize_app(cred)
+    
 db = firestore.client()
 
 def format_firebase_timestamp(ms_timestamp):

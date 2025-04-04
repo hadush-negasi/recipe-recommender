@@ -6,14 +6,16 @@ from firebase_admin import credentials, firestore
 import re
 from datetime import datetime, timezone
 import json
-# Load secret Firebase credentials from Streamlit secrets
-firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
-cred = credentials.Certificate(json.loads(firebase_json))
-firebase_admin.initialize_app(cred)
 
+# Check if Firebase is already initialized
+if not firebase_admin._apps:
+    # Load secret Firebase credentials from Streamlit secrets
+    firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
+    cred = credentials.Certificate(json.loads(firebase_json))
+    firebase_admin.initialize_app(cred)
+    
 db = firestore.client()
 WEB_API_KEY = st.secrets["WEB_API_KEY"]
-
 def app():
     reviews_df = st.session_state.reviews_df
     st.markdown(
