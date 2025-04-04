@@ -104,7 +104,7 @@ def app():
         justify-content: flex-start;
         padding: 0 5%;
     }
-    
+
     .contact-form {
         background-color: #f9f9f9;
         padding: 20px;
@@ -136,9 +136,9 @@ def app():
         background-color: #45a049;
     }
     </style>
-    
+
     <div class="contact-container">
-        <div class="contact-form">
+        <div class="contact-form">        
             <form action="https://formsubmit.co/c927f1508df2319903fe889d7857844a" method="POST">
                 <label>Your Name*</label><br>
                 <input type="text" name="name" required placeholder="John Doe"><br>
@@ -149,13 +149,14 @@ def app():
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_subject" value="New Contact Form Submission">
+                <input type="hidden" name="_next" value="https://recipe-recommend.streamlit.app/">
                 <input type="hidden" name="_autoresponse" value="Thanks for contacting us! We'll get back to you shortly.">
                 <button type="submit">Send Message</button>
             </form>
         </div>
     </div>
     """
-    
+
     st.markdown(form_html, unsafe_allow_html=True)
            
     # ---- Map Embed ----
