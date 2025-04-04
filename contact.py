@@ -132,6 +132,9 @@ def app():
                     res = requests.post("https://formsubmit.co/c927f1508df2319903fe889d7857844a", data=form_data)
 
                     if res.status_code == 200:
+                        st.text(f"Response Code: {res.status_code}")
+                        st.text(res.text)
+                        st.code(res.text, language='json')
                         st.success("✅ Message sent successfully! We'll get back to you soon.")
                     else:
                         st.error("❌ Something went wrong. Please try again.")
