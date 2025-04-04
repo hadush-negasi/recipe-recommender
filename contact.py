@@ -97,47 +97,61 @@ def app():
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
     
-    with st.form("contact_form"):
-        name = st.text_input("Your Name*", placeholder="John Doe")
-        email = st.text_input("Your Email*", placeholder="your@email.com")
-        message = st.text_area("Your Message*", placeholder="Type your message here...", height=150)
-        
-        # Form submit button
-        submitted = st.form_submit_button("Send Message", type="primary")
-        if submitted:
-            if not(name and email and message):
-                st.warning("Please fill all required fields (*)")
-            else:
-                try:
-                    # Validate the email address
-                    valid = validate_email(email)
-                    cleaned_email = valid.email  # This is the normalized, validated email
+    st.markdown("""
+        <style>
+            .contact-form {
+                background-color: #f9f9f9;
+                padding: 20px;
+                border-radius: 12px;
+                max-width: 500px;
+                margin: auto;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            .contact-form input, .contact-form textarea {
+                width: 100%;
+                padding: 10px;
+                margin-top: 8px;
+                margin-bottom: 16px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                box-sizing: border-box;
+                font-size: 14px;
+            }
+            .contact-form button {
+                background-color: #4CAF50;
+                color: white;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            .contact-form button:hover {
+                background-color: #45a049;
+            }
+        </style>
 
-                    # If valid, display success
-                    st.success("Message sent successfully! We'll get back to you soon.")
+        <div class="contact-form">
+            <form action="https://formsubmit.co/c927f1508df2319903fe889d7857844a" method="POST">
+                <label for="name">Your Name*</label>
+                <input type="text" name="name" required placeholder="John Doe">
 
-                    # (Optional) You could process or save this data here
-                    # Prepare data for FormSubmit
-                    form_data = {
-                        "name": name,
-                        "email": cleaned_email,
-                        "message": message,
-                        "_captcha": "false",  # Optional: disables the default CAPTCHA
-                        "_template": "table",  # Optional: email format
-                        "_subject": "New Message from Recipe Recommendation App",
-                        "_autoresponse": "Thanks for reaching out! We'll get back to you shortly.",
-                    }
+                <label for="email">Your Email*</label>
+                <input type="email" name="email" required placeholder="you@example.com">
 
-                    # Send POST request
-                    res = requests.post("https://formsubmit.co/c927f1508df2319903fe889d7857844a", data=form_data)
+                <label for="message">Your Message*</label>
+                <textarea name="message" rows="6" required placeholder="Write your message here..."></textarea>
 
-                    if res.status_code == 200:
-                        st.success("✅ Message sent successfully! We'll get back to you soon.")
-                    else:
-                        st.error("❌ Something went wrong. Please try again.")
+                <!-- Hidden fields -->
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_subject" value="New Contact Form Submission">
+                <input type="hidden" name="_autoresponse" value="Thanks for contacting us! We'll get back to you shortly.">
 
-                except EmailNotValidError as e:
-                    st.error(f"Invalid email address: {e}")
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+        """, unsafe_allow_html=True)
            
     # ---- Map Embed ----
     st.markdown("---")
