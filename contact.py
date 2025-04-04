@@ -93,8 +93,8 @@ def app():
             }
         )
 
-    user_name = st.session_state["user_name"]
-    user_email = st.session_state["user_email"]
+    user_name = st.session_state.user_data.get("name", "john Doe")
+    user_email = st.session_state.user_data.get("email", "you@email.com")
     # ---- Contact Form ----
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
