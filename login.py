@@ -5,20 +5,14 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import re
 from datetime import datetime, timezone
-import os
-from dotenv import load_dotenv
-
-load_dotenv()  # Load environment variables
-
-# Check if Firebase is already initialized
-if not firebase_admin._apps:
-    # Initialize Firebase once if it hasn't been initialized
-    cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH"))
-    firebase_admin.initialize_app(cred)
+import json
+# Load secret Firebase credentials from Streamlit secrets
+firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
+cred = credentials.Certificate(json.loads(firebase_json))
+firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-
-WEB_API_KEY = os.getenv("WEB_API_KEY")
+WEB_API_KEY = st.secrets["WEB_API_KEY"]
 
 def app():
     reviews_df = st.session_state.reviews_df

@@ -11,16 +11,11 @@ from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 from datetime import datetime
-from dotenv import load_dotenv
-
-load_dotenv()
-
-# Check if Firebase is already initialized
-if not firebase_admin._apps:
-    # Initialize Firebase once if it hasn't been initialized
-    cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH"))
-    firebase_admin.initialize_app(cred)
-
+import json
+# Load secret Firebase credentials from Streamlit secrets
+firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
+cred = credentials.Certificate(json.loads(firebase_json))
+firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 

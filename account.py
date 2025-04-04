@@ -6,16 +6,12 @@ from firebase_admin import firestore, credentials
 from datetime import datetime
 import pandas as pd
 import os
-from dotenv import load_dotenv
+import json
+# Load secret Firebase credentials from Streamlit secrets
+firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
+cred = credentials.Certificate(json.loads(firebase_json))
+firebase_admin.initialize_app(cred)
 
-load_dotenv()  # Load environment variables
-
-# Check if Firebase is already initialized
-if not firebase_admin._apps:
-    # Initialize Firebase once if it hasn't been initialized
-    cred = credentials.Certificate(os.getenv("FIREBASE_CREDENTIALS_PATH"))
-    firebase_admin.initialize_app(cred)
-    
 db = firestore.client()
 
 def logout_callback():
