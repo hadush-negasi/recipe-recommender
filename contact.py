@@ -97,7 +97,7 @@ def app():
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
     
-    st.markdown("""
+    st.markdown('''
         <style>
             .contact-form {
                 background-color: #f9f9f9;
@@ -151,7 +151,7 @@ def app():
                 <button type="submit">Send Message</button>
             </form>
         </div>
-        """, unsafe_allow_html=True)
+        ''', unsafe_allow_html=True)
            
     # ---- Map Embed ----
     st.markdown("---")
