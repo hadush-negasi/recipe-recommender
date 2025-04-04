@@ -97,56 +97,66 @@ def app():
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
     
-    st.markdown("""
+    form_html = """
     <style>
-        .contact-form {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 500px;
-            margin: auto;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .contact-form input, .contact-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            margin-bottom: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        .contact-form button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .contact-form button:hover {
-            background-color: #45a049;
-        }
+    .contact-container {
+        display: flex;
+        justify-content: flex-start;
+        padding: 0 5%;
+    }
+    
+    .contact-form {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .contact-form input, .contact-form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+    .contact-form button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .contact-form button:hover {
+        background-color: #45a049;
+    }
     </style>
-    <div class="contact-form">
-        <form action="https://formsubmit.co/c927f1508df2319903fe889d7857844a" method="POST">
-            <label for="name">Your Name*</label>
-            <input type="text" name="name" required placeholder="John Doe">
-            <label for="email">Your Email*</label>
-            <input type="email" name="email" required placeholder="you@example.com">
-            <label for="message">Your Message*</label>
-            <textarea name="message" rows="6" required placeholder="Write your message here..."></textarea>
-            <!-- Hidden fields -->
-            <input type="hidden" name="_captcha" value="false">
-            <input type="hidden" name="_template" value="table">
-            <input type="hidden" name="_subject" value="New Contact Form Submission">
-            <input type="hidden" name="_autoresponse" value="Thanks for contacting us! We'll get back to you shortly.">
-            <button type="submit">Send Message</button>
-        </form>
+    
+    <div class="contact-container">
+        <div class="contact-form">
+            <form action="https://formsubmit.co/c927f1508df2319903fe889d7857844a" method="POST">
+                <label>Your Name*</label><br>
+                <input type="text" name="name" required placeholder="John Doe"><br>
+                <label>Your Email*</label><br>
+                <input type="email" name="email" required placeholder="you@example.com"><br>
+                <label>Your Message*</label><br>
+                <textarea name="message" rows="6" required placeholder="Write your message here..."></textarea><br>
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_subject" value="New Contact Form Submission">
+                <input type="hidden" name="_autoresponse" value="Thanks for contacting us! We'll get back to you shortly.">
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+    
+    st.markdown(form_html, unsafe_allow_html=True)
            
     # ---- Map Embed ----
     st.markdown("---")
