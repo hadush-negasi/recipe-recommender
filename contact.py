@@ -1,5 +1,7 @@
 import streamlit as st
 from streamlit_extras.card import card
+import requests
+from email_validator import validate_email, EmailNotValidError
 
 def app():
     # ---- Hero Section ----
@@ -103,11 +105,40 @@ def app():
         # Form submit button
         submitted = st.form_submit_button("Send Message", type="primary")
         if submitted:
-            if name and email and message:
-                st.success("Message sent successfully! We'll get back to you soon.")
-            else:
+            if not(name and email and message):
                 st.warning("Please fill all required fields (*)")
+            else:
+                try:
+                    # Validate the email address
+                    valid = validate_email(email)
+                    cleaned_email = valid.email  # This is the normalized, validated email
 
+                    # If valid, display success
+                    st.success("Message sent successfully! We'll get back to you soon.")
+
+                    # (Optional) You could process or save this data here
+                    # Prepare data for FormSubmit
+                    form_data = {
+                        "name": name,
+                        "email": cleaned_email,
+                        "message": message,
+                        "_captcha": "false",  # Optional: disables the default CAPTCHA
+                        "_template": "table",  # Optional: email format
+                        "_subject": "New Message from Recipe Recommendation App",
+                        "_autoresponse": "Thanks for reaching out! We'll get back to you shortly.",
+                    }
+
+                    # Send POST request
+                    res = requests.post("https://formsubmit.co/c927f1508df2319903fe889d7857844a", data=form_data)
+
+                    if res.status_code == 200:
+                        st.success("✅ Message sent successfully! We'll get back to you soon.")
+                    else:
+                        st.error("❌ Something went wrong. Please try again.")
+
+                except EmailNotValidError as e:
+                    st.error(f"Invalid email address: {e}")
+           
     # ---- Map Embed ----
     st.markdown("---")
     st.subheader("📍 Find Us on Map")

@@ -95,11 +95,38 @@ if st.session_state.logged_in:
             icons=["shield","lightbulb", "person"],
             default_index=0,
             orientation="horizontal",
-            styles={
-                "container": {"padding": "5px", "background-color": "#f9f9f9"},
-                "icon": {"color": "blue", "font-size": "18px"},
-                "nav-link": {"font-size": "16px", "text-align": "center", "margin": "5px"},
-                "nav-link-selected": {"background-color": "#008CBA", "color": "white"},
+            styles= {
+                "container": {
+                    "padding": "5px",
+                    "background-color": "#f9f9f9",
+                    "border-bottom": "1px solid #e0e0e0",  # Subtle bottom border
+                    "box-shadow": "0 2px 5px rgba(0,0,0,0.05)",  # Soft shadow
+                    "margin-bottom": "10px"  # Space below navbar
+                },
+                "icon": {
+                    "color": "#2e8b57",  # Changed to nature-themed green
+                    "font-size": "18px",
+                    "margin-right": "5px"  # Space between icon and text
+                },
+                "nav-link": {
+                    "font-size": "16px",
+                    "text-align": "center",
+                    "margin": "5px",
+                    "padding": "8px 12px",
+                    "border-radius": "5px",
+                    "color": "#495057",
+                    "transition": "all 0.3s ease"
+                },
+                "nav-link:hover": {  # Hover effect
+                    "background-color": "#e9ecef",
+                    "color": "#2e8b57"
+                },
+                "nav-link-selected": {
+                    "background-color": "#2e8b57",
+                    "color": "white",
+                    "font-weight": "500",
+                    "box-shadow": "0 2px 5px rgba(46, 139, 87, 0.2)"
+                }
             }
         )
         

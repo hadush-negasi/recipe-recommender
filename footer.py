@@ -58,7 +58,7 @@ def footer():
                     Personalized recipe recommendations using machine learning
                 </p>
                 <div class="social-links">
-                    <a href="https://github.com/" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+                    <a href="https://github.com/hadush-negasi" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
                         <i class="fab fa-github"></i>
                     </a>
                     <a href="mailto:hadush7512@gmail.com" aria-label="Email" target="_blank" rel="noopener noreferrer">

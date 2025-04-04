@@ -452,7 +452,7 @@ def app():
                 with header_col1:
                     st.subheader(f":green[{recipe['name']}]", divider='green')
                 with header_col2:
-                    st.button("Back to Recommended Recipes",key=f"home_{recipe['recipe_id']}", on_click=view_recipe_callback, args=(None, False))
+                    st.button("← Back to Recommended Recipes",key=f"home_{recipe['recipe_id']}", on_click=view_recipe_callback, args=(None, False))
                 show_recipe_description(recipe)
         else:
             header_col1,header_col2 = st.columns([3,1])
