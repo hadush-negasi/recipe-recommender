@@ -152,7 +152,6 @@ def app():
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_subject" value="New Contact Form Submission">
-                <input type="hidden" name="_next" value="https://recipe-recommend.streamlit.app/" target="_blank">
                 <input type="hidden" name="_autoresponse" value="Thanks for contacting us! We'll get back to you shortly.">
                 <button type="submit">Send Message</button>
             </form>
