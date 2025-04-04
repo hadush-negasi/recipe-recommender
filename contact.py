@@ -93,6 +93,8 @@ def app():
             }
         )
 
+    user_name = st.session_state["user_name"]
+    user_email = st.session_state["user_email"]
     # ---- Contact Form ----
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
@@ -141,15 +143,15 @@ def app():
         <div class="contact-form">        
             <form action="https://formsubmit.co/c927f1508df2319903fe889d7857844a" method="POST">
                 <label>Your Name*</label><br>
-                <input type="text" name="name" required placeholder="John Doe"><br>
+                <input type="text" name="name" value={user_name} readonly><br>
                 <label>Your Email*</label><br>
-                <input type="email" name="email" required placeholder="you@example.com"><br>
+                <input type="email" name="email" value={user_email} readonly><br>
                 <label>Your Message*</label><br>
                 <textarea name="message" rows="6" required placeholder="Write your message here..."></textarea><br>
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_subject" value="New Contact Form Submission">
-                <input type="hidden" name="_next" value="https://recipe-recommend.streamlit.app/">
+                <input type="hidden" name="_next" value="https://recipe-recommend.streamlit.app/" target="_blank">
                 <input type="hidden" name="_autoresponse" value="Thanks for contacting us! We'll get back to you shortly.">
                 <button type="submit">Send Message</button>
             </form>
