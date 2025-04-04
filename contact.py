@@ -93,29 +93,30 @@ def app():
             }
         )
 
-    user_name = st.session_state.user_data.get("name", "john Doe")
+    user_name = st.session_state.user_data.get("name", "John Doe")
     user_email = st.session_state.user_data.get("email", "you@email.com")
+
     # ---- Contact Form ----
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
-    
-    form_html = """
+
+    form_html = f"""
     <style>
-    .contact-container {
+    .contact-container {{
         display: flex;
         justify-content: flex-start;
         padding: 0 5%;
-    }
+    }}
 
-    .contact-form {
+    .contact-form {{
         background-color: #f9f9f9;
         padding: 20px;
         border-radius: 12px;
         max-width: 500px;
         width: 100%;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .contact-form input, .contact-form textarea {
+    }}
+    .contact-form input, .contact-form textarea {{
         width: 100%;
         padding: 10px;
         margin-top: 8px;
@@ -124,8 +125,8 @@ def app():
         border-radius: 8px;
         box-sizing: border-box;
         font-size: 14px;
-    }
-    .contact-form button {
+    }}
+    .contact-form button {{
         background-color: #4CAF50;
         color: white;
         padding: 12px 20px;
@@ -133,19 +134,19 @@ def app():
         border-radius: 8px;
         cursor: pointer;
         font-size: 16px;
-    }
-    .contact-form button:hover {
+    }}
+    .contact-form button:hover {{
         background-color: #45a049;
-    }
+    }}
     </style>
 
     <div class="contact-container">
         <div class="contact-form">        
             <form action="https://formsubmit.co/c927f1508df2319903fe889d7857844a" method="POST">
                 <label>Your Name*</label><br>
-                <input type="text" name="name" value={user_name} readonly><br>
+                <input type="text" name="name" value="{user_name}" readonly><br>
                 <label>Your Email*</label><br>
-                <input type="email" name="email" value={user_email} readonly><br>
+                <input type="email" name="email" value="{user_email}" readonly><br>
                 <label>Your Message*</label><br>
                 <textarea name="message" rows="6" required placeholder="Write your message here..."></textarea><br>
                 <input type="hidden" name="_captcha" value="false">
