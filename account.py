@@ -18,6 +18,7 @@ db = firestore.client()
 
 def logout_callback():
     st.session_state.clear()
+    st.cache_data.clear()
     st.success("You have been logged out successfully!")
 
 def get_user_favorites_count(user_id):
