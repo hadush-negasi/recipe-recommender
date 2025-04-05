@@ -159,7 +159,34 @@ def app():
     </div>
     """
 
-    st.markdown(form_html, unsafe_allow_html=True)
+    #st.markdown(form_html, unsafe_allow_html=True)
+    with st.form("contact_form"):
+        name = st.text_input("Name")
+        email = st.text_input("Email")
+        message = st.text_area("Message")
+        submitted = st.form_submit_button("Send")
+
+        if submitted:
+            # Send form data to formsubmit.co via POST
+            response = requests.post(
+                "https://formsubmit.co/c927f1508df2319903fe889d7857844a",  # Replace with your real email
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                json={
+                    "name": name,
+                    "email": email,
+                    "message": message
+                }
+            )
+
+            if response.status_code == 200:
+                st.success("Message sent successfully!")
+                st.json(response.json())  # Optional: show response
+            else:
+                st.error("Failed to send message.")
+                st.write(response.text)
            
     # ---- Map Embed ----
     st.markdown("---")
