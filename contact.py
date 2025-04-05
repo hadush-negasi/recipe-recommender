@@ -169,7 +169,7 @@ def app():
         if submitted:
             # Send form data to formsubmit.co via POST
             response = requests.post(
-                "https://formsubmit.co/c927f1508df2319903fe889d7857844a",  # Replace with your real email
+                "https://formsubmit.co/ajax/c927f1508df2319903fe889d7857844a",  # Replace with your real email
                 headers={
                     "Content-Type": "application/json",
                     "Accept": "application/json"
