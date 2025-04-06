@@ -1,11 +1,11 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-from recipe_recommend import getRecommendations
 from streamlit_extras.card import card
 from streamlit_extras.grid import grid
 from recipe_display import show_recipe_description, view_recipe_callback
 from streamlit_extras.add_vertical_space import add_vertical_space
+import pandas as pd
+import numpy as np
+from recipe_recommend import getRecommendations
 
 @st.cache_data
 def get_recipes(personalized="Popular"):
@@ -42,8 +42,13 @@ def get_recipes(personalized="Popular"):
         st.error("invalid recommedation type, please select, User-Based, Item-Based or Popular")
     return recommended_recipes
 
+
 def search_recipe_callback():
     st.session_state.current_page = "recipe_search"
+
+def recommeded_recipes_callback():
+    view_recipe_callback(None, False)
+    get_recipes.clear(personalized=st.session_state.rec_choice) # clear the cache to reload the updated data removing the rated recipe
 
 def show_recipes(recommended_recipes):
     # Create a grid of boxes (3 columns)
@@ -125,7 +130,7 @@ def show_recipes(recommended_recipes):
                             "View Details", 
                             key=f"view_recipe{row['recipe_id']}", 
                             on_click=view_recipe_callback, 
-                            args=(row["recipe_id"], True),
+                            args=(row, True),
                             # Optional: make button more compact
                             use_container_width=True
                         )
@@ -460,7 +465,7 @@ def app():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-                st.button("Show Popular Recipes", type="primary", on_click=handle_options_btn, args=("Popular",))
+                st.button("Show Popular Recipes", type="primary", on_click=handle_options_btn, args=("Popular",), use_container_width=True)
             with col2:
                 st.button("← Back to Recommendation Options",type="secondary", on_click=handle_options_btn, args=(None,))            
             return
@@ -503,7 +508,7 @@ def app():
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-                st.button("Try Popular Recipes", type="primary", on_click=handle_options_btn, args=("Popular",))
+                st.button("Try Popular Recipes", type="primary", on_click=handle_options_btn, args=("Popular",), use_container_width=True)
             with col2:
                 st.button("← Back to Recommendation Options", type="secondary", on_click=handle_options_btn, args=(None,))
             return
@@ -518,19 +523,20 @@ def app():
             user_name = st.session_state.user_data.get('name', '')
             header_text = f"👋 {user_name} Welcome! Check Out Popular Recipes"
             subheader_text = "Not sure what to cook? Here are some of the most-loved recipes!"
-
+            
         recommended_recipes = get_recipes(personalized=st.session_state.rec_choice)
 
         # UI rendering
         # Check if a recipe description should be shown    
-        if st.session_state.show_description and st.session_state.selected_recipe:
+        if st.session_state.show_description and (not st.session_state.selected_recipe.empty):
             with st.spinner("Loading selected recipe details..."):
-                recipe = recommended_recipes[recommended_recipes['recipe_id']==st.session_state.selected_recipe].iloc[0]
+                #recipe = recommended_recipes[recommended_recipes['recipe_id']==st.session_state.selected_recipe].iloc[0]
+                recipe = st.session_state.selected_recipe
                 header_col1, header_col2 = st.columns([3,1])
                 with header_col1:
                     st.subheader(f":green[{recipe['name']}]", divider='green')
                 with header_col2:
-                    st.button("← Back to Recommended Recipes",key=f"home_{recipe['recipe_id']}", on_click=view_recipe_callback, args=(None, False))
+                    st.button("← Back to Recommended Recipes",key=f"home_{recipe['recipe_id']}", on_click=recommeded_recipes_callback)
                 show_recipe_description(recipe)
         else:
             header_col1,header_col2 = st.columns([3,1])

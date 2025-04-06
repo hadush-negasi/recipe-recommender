@@ -1,11 +1,11 @@
 import streamlit as st
 import numpy as np
 
-def view_recipe_callback(recipe_id, show_description):
+def view_recipe_callback(recipe, show_description):
     """
     Callback function to update session state when "View Details" is clicked.
     """
-    st.session_state.selected_recipe = recipe_id
+    st.session_state.selected_recipe = recipe
     st.session_state.show_description = show_description
 
 # Dispalay selected recipe
@@ -88,7 +88,7 @@ def show_recipe_description(recipe):
             (reviews_df['user_id'] == user_id) & 
             (reviews_df['recipe_id'] == recipe['recipe_id'])
         ].empty
-
+        
         if not user_has_rated:
             # Use a form to collect feedback
             with st.form(key='feedback_form', clear_on_submit=True):
@@ -105,12 +105,9 @@ def show_recipe_description(recipe):
                 submit = st.form_submit_button("Submit Feedback")
             if submit:
                 if feedback_rating is None:
-                    st.error("⚠️ Please select a rating before submitting.")
+                    st.error("⚠️ Please select a rating before submitting your feedback.")
                 else:
                     feedback_rating = feedback_rating + 1
-                    #print(user_id)
-                    st.write("feedback_rating: ", feedback_rating)
-                    st.write("feedback comment: ", feedback_comment)
                     #print("feedback_rating: ", feedback_rating)
                     #print("feedback comment: ", feedback_comment)
                     # Append feedback to reviews_df
@@ -121,13 +118,9 @@ def show_recipe_description(recipe):
                     }
                     reviews_df.loc[len(reviews_df)] = new_review
                     #st.write(new_review)
-                    #print(reviews_df[reviews_df['user_id']==user_id])
                     # Save the updated reviews_df to the feather file
                     reviews_df.to_feather('Data/reviews_df.feather')
-                    # Mark feedback as submitted
-                    st.session_state.feedback_submitted = True
                     st.success("Thank you for your feedback! 🎉")
-                    st.cache_data.clear() # clear cached data so it shows updated recipes
         else:
             st.info("You've already rated this recipe. Thank you! 🎉")
     #print(f"Time taken show selected recipe: {time.time() - start_time:.2f} seconds")

@@ -43,8 +43,8 @@ def clear_result_callback():
     st.session_state.search_results = None
     st.session_state.matching_recipes_page = 1
 
-def handle_select_recipe(recipe_id):
-    st.session_state.selected_recipe = recipe_id
+def handle_select_recipe(recipe):
+    st.session_state.selected_recipe = recipe
     st.session_state.show_description = True
 
 # Filter out recipes to find a match base on the inputs tags, ingredients, max minutes, number of steps to cook
@@ -165,10 +165,10 @@ def paginate_recipes(recipes, page_size=5, page_state_key="current_page"):
                         unsafe_allow_html=True
                     )
                 # Button to select the recipe
-                st.button(f"Select {recipe['name']}", key=f"select_{recipe_id}", on_click=handle_select_recipe, args=(recipe['recipe_id'],), use_container_width=True)
+                st.button(f"Select {recipe['name']}", key=f"select_{recipe_id}", on_click=handle_select_recipe, args=(recipe,), use_container_width=True)
                     
             # Conditionally render the markdown after the button is clicked
-            if st.session_state.show_description and st.session_state.selected_recipe == recipe['recipe_id']:
+            if st.session_state.show_description and st.session_state.selected_recipe['recipe_id'] == recipe_id:
                 st.markdown(f"<a href='#selected_recipe'>go to recipe</a>", unsafe_allow_html=True)
     # Display current page information
     st.write(f"Page {st.session_state[page_state_key]} of {total_pages}")
@@ -244,11 +244,11 @@ def app():
                     st.write("Couldn't find matching recipes.")
 
     # Display selected recipe details if a recipe is selected
-    if st.session_state.show_description and st.session_state.selected_recipe is not None:
+    if st.session_state.show_description and (not st.session_state.selected_recipe.empty):
         with st.container(border=True):
             # Use st.status for a persistent loading indicator
             with st.spinner("Loading selected recipe details..."):
-                recipe = st.session_state.recipes_df[st.session_state.recipes_df['recipe_id'] == st.session_state.selected_recipe].iloc[0]
+                recipe = st.session_state.recipes_df[st.session_state.recipes_df['recipe_id'] == st.session_state.selected_recipe["recipe_id"]].iloc[0]
                 st.subheader(f":green[{recipe['name']}]", divider='green', anchor='selected_recipe')
                 # Display selected recipe
                 show_recipe_description(recipe)
