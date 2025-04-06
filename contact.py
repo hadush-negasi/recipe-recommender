@@ -100,7 +100,7 @@ def app():
     # ---- Contact Form ----
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
-    with st.form("contact_form"):
+    with st.form("contact_form", clear_on_submit=True):
         name = st.text_input("Name", key="name", value=name, disabled=True)
         email = st.text_input("Email", key="email", value=email, disabled=True)
         message = st.text_area(label="message",key="message", placeholder="Write your message here...")
@@ -146,7 +146,7 @@ def app():
                 }});
                 </script>
                 """,
-                height=70,
+                height=40,
             )
            
     # ---- Map Embed ----
@@ -170,3 +170,4 @@ def app():
         st.markdown("[![LinkedIn](https://img.icons8.com/color/48/000000/linkedin.png)](https://linkedin.com)")
     with social_cols[3]:
         st.markdown("[![Facebook](https://img.icons8.com/color/48/000000/facebook-new.png)](https://facebook.com)")
+app()
