@@ -225,208 +225,210 @@ def user_basedCF():
 
 
 def app():
-    st.header("Welcome Admin")
-    # Clear delete state
-    if "confirm_delete" not in st.session_state:
-        st.session_state.confirm_delete = False
-    if "user_to_delete" not in st.session_state:
-        st.session_state.user_to_delete = None
-    
-    # Create tabs for different functionalities
-    tab1, tab2, tab3 = st.tabs(["Data Exploration", "Model Management", "User Management"])
-    
-    with tab1:
-        st.subheader("Dataset Explorer")
-        
-        # Dataset selection
-        dataset = st.selectbox(
-            "Choose Dataset to Explore",
-            options=["Recipes", "Reviews", "User Predictions", "Item Predictions"],
-            index=0
-        )
-        
-        # Load corresponding dataframe
-        if dataset == "Recipes":
-            df = st.session_state.recipes_df
-        elif dataset == "Reviews":
-            df = st.session_state.reviews_df.copy()
-        elif dataset == "User Predictions":
-            df = st.session_state.user_pred_df
-            df.columns = df.columns.astype(str)  # Convert integer columns to strings
-        elif dataset == "Item Predictions":
-            df = st.session_state.item_pred_df
-            df.columns = df.columns.astype(str)  # Convert integer columns to strings
-        # Configure AgGrid options based on dataset
-        gb = GridOptionsBuilder.from_dataframe(df)
-        gb.configure_pagination(paginationAutoPageSize=True)
-        gb.configure_side_bar()
-        # Set default column width
-        #gb.configure_default_column(width=200)
+    try:
+        st.header("Welcome Admin")
+        # Clear delete state
+        if "confirm_delete" not in st.session_state:
+            st.session_state.confirm_delete = False
+        if "user_to_delete" not in st.session_state:
+            st.session_state.user_to_delete = None
 
-        # Special handling for tags column in Recipes
-        if dataset == "Recipes":
-            # Configure wide columns
-            gb.configure_column("tags", width=150, wrapText=True, autoHeight=True)
-            gb.configure_column("name", width=200, wrapText=True)
-            gb.configure_column("description", width=150, wrapText=True)
-            gb.configure_column("ingredients", width=150, wrapText=True)
-            gb.configure_column("steps", width=150, wrapText=True)
-            gb.configure_column("Images", width=150)
-    
-            # Pin important columns to the left
-            gb.configure_columns(['recipe_id','name'], pinned='left')
-        
-        # Enable editing only for Recipes and Reviews
-        if dataset == "Reviews":
-            gb.configure_default_column(editable=True, groupable=True)
-            st.warning("⚠️ You can edit cells directly in the table below")
-        else:
-            st.info("View-only mode for this dataset")
-        
-        gridOptions = gb.build()
-        gridOptions['alwaysShowHorizontalScroll'] = True
-        
-        # Display the grid
-        grid_response = AgGrid(
-            df,
-            gridOptions=gridOptions,
-            update_mode=GridUpdateMode.MODEL_CHANGED,
-            allow_unsafe_jscode=True,
-            height=500,
-            key=f"grid_{dataset}"  # Unique key for each dataset
-        )
-        
-        # Get the updated dataframe if changes were made
-        if dataset == "Reviews":
-            updated_df = grid_response['data']
-            
-            if not updated_df.equals(df):
-                st.success("Changes detected!")
-                
-                if st.button("Save Changes"):
-                    st.session_state.reviews_df = updated_df
-                    st.success("Changes saved successfully!")
-        
-        # Add row functionality for Recipes and Reviews
-        if dataset == "Reviews":
-            st.subheader("Add New Record")
-            cols = st.columns(len(df.columns))
-            new_record = {}
-            
-            for i, col in enumerate(df.columns):
-                with cols[i]:
-                    new_record[col] = st.text_input(f"{col}", key=f"new_{col}")
-            
-            if st.button("Add Record"):
-                if all(new_record.values()):  # Check all fields are filled
-                    updated_df = pd.concat([updated_df, pd.DataFrame([new_record])], ignore_index=True)
-                    if dataset == "Reviews":
-                        st.session_state.reviews_df = updated_df
-                    st.success("Record added successfully!")
-                    st.experimental_rerun()
-                else:
-                    st.error("Please fill all fields")
-        
-    with tab2:
-        st.subheader("Model Operations")
-        retrain = st.button("Model Retrain")
-        if retrain:
-            user_basedCF()
-    
-    with tab3:
-        st.subheader("Registered Users")
-        
-        # Get and display users
-        users_df = get_all_users()
-        
-        if not users_df.empty:
-            # Smaller AgGrid configuration
-            gb = GridOptionsBuilder.from_dataframe(users_df)
-            gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=5)
-            gb.configure_side_bar()
-            gb.configure_selection('single')
-            
-            # Custom column configuration
-            gb.configure_column("uid", hide=True)
-            gb.configure_column("email", width=200)
-            gb.configure_column("name", width=150)
-            gb.configure_column("user_id", width=80)
-            gb.configure_column("created_at", width=150, headerName="Joined")
-            gb.configure_column("last_login", width=150, headerName="Last Active")
-            
-            gridOptions = gb.build()
-            
-            # Display with smaller height
-            grid_response = AgGrid(
-                users_df,
-                gridOptions=gridOptions,
-                update_mode=GridUpdateMode.SELECTION_CHANGED,
-                height=300,  # Reduced height
-                fit_columns_on_grid_load=True,
-                key="users_grid"
+        # Create tabs for different functionalities
+        tab1, tab2, tab3 = st.tabs(["Data Exploration", "Model Management", "User Management"])
+
+        with tab1:
+            st.subheader("Dataset Explorer")
+
+            # Dataset selection
+            dataset = st.selectbox(
+                "Choose Dataset to Explore",
+                options=["Recipes", "Reviews", "User Predictions", "Item Predictions"],
+                index=0
             )
-            
-            # Handle selection
-            selected_rows = grid_response.get('selected_rows', [])
-            # Proper way to check if any rows are selected
-            if isinstance(selected_rows, pd.DataFrame):
-                if not selected_rows.empty:
-                    selected_user = selected_rows.iloc[0].to_dict()
-            
-                    # Cleaner user details display
-                    with st.expander("👤 User Details", expanded=True):
-                        cols = st.columns(3)
-                        with cols[0]:
-                            st.metric("Name", selected_user.get('name', 'N/A'))
-                            st.write("**Email**")
-                            # Use text area for long emails with copy button
-                            email = selected_user.get('email', 'N/A')
-                            st.code(email, language='text')
-                           #st.metric("Email", selected_user.get('email', 'N/A'))
-                            st.metric("Age", selected_user.get("age", "N/A"))
 
-                        with cols[1]:
-                            st.metric("User ID", selected_user.get('user_id', 'N/A'))
-                            st.metric("Country", selected_user.get('country', 'N/A'))
-                        with cols[2]:
-                            st.metric("Occupation", selected_user.get('occupation', 'N/A'))
-                            st.metric("Phone", selected_user.get("phone", "N/A"))
+            # Load corresponding dataframe
+            if dataset == "Recipes":
+                df = st.session_state.recipes_df
+            elif dataset == "Reviews":
+                df = st.session_state.reviews_df.copy()
+            elif dataset == "User Predictions":
+                df = st.session_state.user_pred_df
+                df.columns = df.columns.astype(str)  # Convert integer columns to strings
+            elif dataset == "Item Predictions":
+                df = st.session_state.item_pred_df
+                df.columns = df.columns.astype(str)  # Convert integer columns to strings
+            # Configure AgGrid options based on dataset
+            gb = GridOptionsBuilder.from_dataframe(df)
+            gb.configure_pagination(paginationAutoPageSize=True)
+            gb.configure_side_bar()
+            # Set default column width
+            #gb.configure_default_column(width=200)
 
-                        st.divider()
-                        cols = st.columns(2)
-                        with cols[0]:
-                            st.write("**Account Created**")
-                            st.code(selected_user.get('created_at', 'Unknown'))
-                        with cols[1]:
-                            st.write("**Last Activity**")
-                            st.code(selected_user.get('last_login', 'Unknown'))
+            # Special handling for tags column in Recipes
+            if dataset == "Recipes":
+                # Configure wide columns
+                gb.configure_column("tags", width=150, wrapText=True, autoHeight=True)
+                gb.configure_column("name", width=200, wrapText=True)
+                gb.configure_column("description", width=150, wrapText=True)
+                gb.configure_column("ingredients", width=150, wrapText=True)
+                gb.configure_column("steps", width=150, wrapText=True)
+                gb.configure_column("Images", width=150)
 
-                        # Delete button with confirmation
-                        st.divider()
-                        if st.button("🗑️ Delete User", type="primary", key="delete_btn"):
-                            st.session_state.confirm_delete = True
-                            st.session_state.user_to_delete = selected_user
-                            
-        else:
-            st.warning("No registered users found")
+                # Pin important columns to the left
+                gb.configure_columns(['recipe_id','name'], pinned='left')
 
-        # Confirmation modal (appears outside the main flow)
-        if st.session_state.confirm_delete and st.session_state.user_to_delete:
-            user = st.session_state.user_to_delete
-            
-            with st.container():
-                st.error(f"You are about to permanently delete: {user['email']}")
-                
-                cols = st.columns(2)
-                with cols[0]:
-                    if st.button("✅ Confirm Delete", type="primary"):
-                        if delete_user(user['uid']):
-                            st.success(f"Deleted {user['email']}")
-                            st.rerun()
-                        else:
+            # Enable editing only for Recipes and Reviews
+            if dataset == "Reviews":
+                gb.configure_default_column(editable=True, groupable=True)
+                st.warning("⚠️ You can edit cells directly in the table below")
+            else:
+                st.info("View-only mode for this dataset")
+
+            gridOptions = gb.build()
+            gridOptions['alwaysShowHorizontalScroll'] = True
+
+            # Display the grid
+            grid_response = AgGrid(
+                df,
+                gridOptions=gridOptions,
+                update_mode=GridUpdateMode.MODEL_CHANGED,
+                allow_unsafe_jscode=True,
+                height=500,
+                key=f"grid_{dataset}"  # Unique key for each dataset
+            )
+
+            # Get the updated dataframe if changes were made
+            if dataset == "Reviews":
+                updated_df = grid_response['data']
+
+                if not updated_df.equals(df):
+                    st.success("Changes detected!")
+
+                    if st.button("Save Changes"):
+                        st.session_state.reviews_df = updated_df
+                        st.success("Changes saved successfully!")
+
+            # Add row functionality for Recipes and Reviews
+            if dataset == "Reviews":
+                st.subheader("Add New Record")
+                cols = st.columns(len(df.columns))
+                new_record = {}
+
+                for i, col in enumerate(df.columns):
+                    with cols[i]:
+                        new_record[col] = st.text_input(f"{col}", key=f"new_{col}")
+
+                if st.button("Add Record"):
+                    if all(new_record.values()):  # Check all fields are filled
+                        updated_df = pd.concat([updated_df, pd.DataFrame([new_record])], ignore_index=True)
+                        if dataset == "Reviews":
+                            st.session_state.reviews_df = updated_df
+                        st.success("Record added successfully!")
+                        st.experimental_rerun()
+                    else:
+                        st.error("Please fill all fields")
+
+        with tab2:
+            st.subheader("Model Operations")
+            retrain = st.button("Model Retrain")
+            if retrain:
+                user_basedCF()
+
+        with tab3:
+            st.subheader("Registered Users")
+
+            # Get and display users
+            users_df = get_all_users()
+
+            if not users_df.empty:
+                # Smaller AgGrid configuration
+                gb = GridOptionsBuilder.from_dataframe(users_df)
+                gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=5)
+                gb.configure_side_bar()
+                gb.configure_selection('single')
+
+                # Custom column configuration
+                gb.configure_column("uid", hide=True)
+                gb.configure_column("email", width=200)
+                gb.configure_column("name", width=150)
+                gb.configure_column("user_id", width=80)
+                gb.configure_column("created_at", width=150, headerName="Joined")
+                gb.configure_column("last_login", width=150, headerName="Last Active")
+
+                gridOptions = gb.build()
+
+                # Display with smaller height
+                grid_response = AgGrid(
+                    users_df,
+                    gridOptions=gridOptions,
+                    update_mode=GridUpdateMode.SELECTION_CHANGED,
+                    height=300,  # Reduced height
+                    fit_columns_on_grid_load=True,
+                    key="users_grid"
+                )
+
+                # Handle selection
+                selected_rows = grid_response.get('selected_rows', [])
+                # Proper way to check if any rows are selected
+                if isinstance(selected_rows, pd.DataFrame):
+                    if not selected_rows.empty:
+                        selected_user = selected_rows.iloc[0].to_dict()
+
+                        # Cleaner user details display
+                        with st.expander("👤 User Details", expanded=True):
+                            cols = st.columns(3)
+                            with cols[0]:
+                                st.metric("Name", selected_user.get('name', 'N/A'))
+                                st.write("**Email**")
+                                # Use text area for long emails with copy button
+                                email = selected_user.get('email', 'N/A')
+                                st.code(email, language='text')
+                               #st.metric("Email", selected_user.get('email', 'N/A'))
+                                st.metric("Age", selected_user.get("age", "N/A"))
+
+                            with cols[1]:
+                                st.metric("User ID", selected_user.get('user_id', 'N/A'))
+                                st.metric("Country", selected_user.get('country', 'N/A'))
+                            with cols[2]:
+                                st.metric("Occupation", selected_user.get('occupation', 'N/A'))
+                                st.metric("Phone", selected_user.get("phone", "N/A"))
+
+                            st.divider()
+                            cols = st.columns(2)
+                            with cols[0]:
+                                st.write("**Account Created**")
+                                st.code(selected_user.get('created_at', 'Unknown'))
+                            with cols[1]:
+                                st.write("**Last Activity**")
+                                st.code(selected_user.get('last_login', 'Unknown'))
+
+                            # Delete button with confirmation
+                            st.divider()
+                            if st.button("🗑️ Delete User", type="primary", key="delete_btn"):
+                                st.session_state.confirm_delete = True
+                                st.session_state.user_to_delete = selected_user
+
+            else:
+                st.warning("No registered users found")
+
+            # Confirmation modal (appears outside the main flow)
+            if st.session_state.confirm_delete and st.session_state.user_to_delete:
+                user = st.session_state.user_to_delete
+
+                with st.container():
+                    st.error(f"You are about to permanently delete: {user['email']}")
+
+                    cols = st.columns(2)
+                    with cols[0]:
+                        if st.button("✅ Confirm Delete", type="primary"):
+                            if delete_user(user['uid']):
+                                st.success(f"Deleted {user['email']}")
+                                st.rerun()
+                            else:
+                                st.session_state.confirm_delete = False
+                    with cols[1]:
+                        if st.button("❌ Cancel"):
                             st.session_state.confirm_delete = False
-                with cols[1]:
-                    if st.button("❌ Cancel"):
-                        st.session_state.confirm_delete = False
-                        st.rerun()
-    
+                            st.rerun()
+    except Exception as e:
+        st.error("Oops! Something went wrong.")    

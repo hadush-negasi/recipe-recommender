@@ -21,14 +21,6 @@ def check_ingredients_df(row, selected):
     return True
 
 
-def truncate_text(text, word_limit=20):
-    """Truncates text to a specific number of words and adds '...' if longer."""
-    words = text.split()  # Split text into words
-    if len(words) > word_limit:
-        return " ".join(words[:word_limit]) + "..."  # Keep only the first `word_limit` words
-    return text  # Return full text if it's short enough
-
-
 def is_valid_image(url):
     """Check if the image URL is valid by sending a HEAD request."""
     try:
@@ -175,82 +167,84 @@ def paginate_recipes(recipes, page_size=5, page_state_key="current_page"):
 
 
 def app():
-    #place the header on the left side of page
-    st.header(":blue[_What’s Cooking? Find Recipes Instantly!_] 🍽️")
+    try:
+        #place the header on the left side of page
+        st.header(":blue[_What’s Cooking? Find Recipes Instantly!_] 🍽️")
 
-    if "show_description" not in st.session_state:
-        st.session_state.show_description = False
-    if "selected_recipe" not in st.session_state:
-        st.session_state.selected_recipe = None
+        if "show_description" not in st.session_state:
+            st.session_state.show_description = False
+        if "selected_recipe" not in st.session_state:
+            st.session_state.selected_recipe = None
 
-    # Set session state for recipe viewing mode
-    if "search_results" not in st.session_state:
-        st.session_state.search_results = None # stores the filtered recipes  
-    
-    # Initialize session state for the current page if it doesn't exist
-    if "matching_recipes_page" not in st.session_state:
-        st.session_state.matching_recipes_page = 1
-    
-    tag_options = ['60-minutes-or-less', '30-minutes-or-less', '15-minutes-or-less', 'easy', 'meat', 'poultry', 'vegetables', 
-               'fruit', 'pasta-rice-and-grains', 'inexpensive', 'dietary', 'healthy', 'low-carb', 'low-sodium', 'low-saturated-fat', 'low-calorie', 
-               'low-cholesterol', 'low-fat', 'breakfast', 'beginner-cook']
+        # Set session state for recipe viewing mode
+        if "search_results" not in st.session_state:
+            st.session_state.search_results = None # stores the filtered recipes  
 
-    # Create a centered form with limited width
-    col1, col2 = st.columns([1, 2])  # Middle column is wider
-    with col1:
-        # form to collect recipe tags, ingredients, number of cooking steps, total minute
-        with st.form(key='search_form'):
-            tags_selected = st.multiselect("Please select any tags for a meal you are interested in.", tag_options)
+        # Initialize session state for the current page if it doesn't exist
+        if "matching_recipes_page" not in st.session_state:
+            st.session_state.matching_recipes_page = 1
 
-            ing_selected = st.text_input('Please enter any ingredients you have on hand separated by commas.',
-                                         help='Use lowercase and plural form when appropriate', autocomplete='off')
-            # Input for the maximum number of minutes
-            max_minutes = st.number_input('Select Maximum Cooking Time (minutes)', 
-                                              min_value=1, 
-                                              max_value=120,  # Set a max value based on your dataset
-                                              value=None)  # Default value
+        tag_options = ['60-minutes-or-less', '30-minutes-or-less', '15-minutes-or-less', 'easy', 'meat', 'poultry', 'vegetables', 
+                   'fruit', 'pasta-rice-and-grains', 'inexpensive', 'dietary', 'healthy', 'low-carb', 'low-sodium', 'low-saturated-fat', 'low-calorie', 
+                   'low-cholesterol', 'low-fat', 'breakfast', 'beginner-cook']
 
-            # Input for the maximum number of steps
-            max_steps = st.number_input('Select Maximum Number of Steps', 
-                                           min_value=1, 
-                                           max_value=24,  # Set a max value based on your dataset
-                                           value=None)  # Default value
+        # Create a centered form with limited width
+        col1, col2 = st.columns([1, 2])  # Middle column is wider
+        with col1:
+            # form to collect recipe tags, ingredients, number of cooking steps, total minute
+            with st.form(key='search_form'):
+                tags_selected = st.multiselect("Please select any tags for a meal you are interested in.", tag_options)
 
-            submit = st.form_submit_button('Search for matching Recipes')
+                ing_selected = st.text_input('Please enter any ingredients you have on hand separated by commas.',
+                                             help='Use lowercase and plural form when appropriate', autocomplete='off')
+                # Input for the maximum number of minutes
+                max_minutes = st.number_input('Select Maximum Cooking Time (minutes)', 
+                                                  min_value=1, 
+                                                  max_value=120,  # Set a max value based on your dataset
+                                                  value=None)  # Default value
 
-        # after submission
-        if submit:
-            with st.spinner("Searching for Matching Recipes..."):
-                # run recipe filter and store result in session state
-                # clear previous search result
-                st.session_state.search_results = None
-                st.session_state.matching_recipes_page = 1
-                st.session_state.show_description = False
-                st.session_state.search_results = filter_recipes(tags_selected, ing_selected, max_minutes, max_steps)
-    with col2:
-        # Display search results 
-        if st.session_state.search_results is not None:
+                # Input for the maximum number of steps
+                max_steps = st.number_input('Select Maximum Number of Steps', 
+                                               min_value=1, 
+                                               max_value=24,  # Set a max value based on your dataset
+                                               value=None)  # Default value
+
+                submit = st.form_submit_button('Search for matching Recipes')
+
+            # after submission
+            if submit:
+                with st.spinner("Searching for Matching Recipes..."):
+                    # run recipe filter and store result in session state
+                    # clear previous search result
+                    st.session_state.search_results = None
+                    st.session_state.matching_recipes_page = 1
+                    st.session_state.show_description = False
+                    st.session_state.search_results = filter_recipes(tags_selected, ing_selected, max_minutes, max_steps)
+        with col2:
+            # Display search results 
+            if st.session_state.search_results is not None:
+                with st.container(border=True):
+                    if not st.session_state.search_results.empty:
+                        header_col1,header_col2 = st.columns([3,1])
+                        with header_col1:
+                            st.subheader(':green[Matching Recipes]', divider='green')
+                        with header_col2:
+                            st.button("Clear Search Results", on_click=clear_result_callback)
+
+                        # Reset the page number to first page
+                        paginate_recipes(st.session_state.search_results, page_size=5, page_state_key='matching_recipes_page')   
+                    else:
+                        st.write("Couldn't find matching recipes.")
+
+        # Display selected recipe details if a recipe is selected
+        if st.session_state.show_description and (not st.session_state.selected_recipe.empty):
             with st.container(border=True):
-                if not st.session_state.search_results.empty:
-                    header_col1,header_col2 = st.columns([3,1])
-                    with header_col1:
-                        st.subheader(':green[Matching Recipes]', divider='green')
-                    with header_col2:
-                        st.button("Clear Search Results", on_click=clear_result_callback)
+                # Use st.status for a persistent loading indicator
+                with st.spinner("Loading selected recipe details..."):
+                    recipe = st.session_state.recipes_df[st.session_state.recipes_df['recipe_id'] == st.session_state.selected_recipe["recipe_id"]].iloc[0]
+                    st.subheader(f":green[{recipe['name']}]", divider='green', anchor='selected_recipe')
+                    # Display selected recipe
+                    show_recipe_description(recipe)
+    except Exception as e:
+        st.error("Oops! Something went wrong.")
 
-                    # Reset the page number to first page
-                    paginate_recipes(st.session_state.search_results, page_size=5, page_state_key='matching_recipes_page')   
-                else:
-                    st.write("Couldn't find matching recipes.")
-
-    # Display selected recipe details if a recipe is selected
-    if st.session_state.show_description and (not st.session_state.selected_recipe.empty):
-        with st.container(border=True):
-            # Use st.status for a persistent loading indicator
-            with st.spinner("Loading selected recipe details..."):
-                recipe = st.session_state.recipes_df[st.session_state.recipes_df['recipe_id'] == st.session_state.selected_recipe["recipe_id"]].iloc[0]
-                st.subheader(f":green[{recipe['name']}]", divider='green', anchor='selected_recipe')
-                # Display selected recipe
-                show_recipe_description(recipe)
-              
-            

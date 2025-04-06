@@ -50,24 +50,26 @@ def display_recipes(recommendations, filter_type, user_id):
 
 
 def app():
-    st.sidebar.header("Recipe Recommendation System")
-    # Get the maximum user_id dynamically
-    max_user_id = st.session_state.user_pred_df["user_id"].max()
+    try:
+        st.sidebar.header("Recipe Recommendation System")
+        # Get the maximum user_id dynamically
+        max_user_id = st.session_state.user_pred_df["user_id"].max()
 
-    # Create a form in the sidebar
-    with st.sidebar.form(key="recommendation_form"):
-        userid = st.number_input("User ID", min_value=0, max_value=max_user_id, value=5, step=1)
-        filter_type = st.selectbox("Select Recommendation Type", ["User-Based", "Item-Based"])
-        n_items = st.number_input("Number of Recommendations", min_value=1, max_value=20, value=5, step=1)
+        # Create a form in the sidebar
+        with st.sidebar.form(key="recommendation_form"):
+            userid = st.number_input("User ID", min_value=0, max_value=max_user_id, value=5, step=1)
+            filter_type = st.selectbox("Select Recommendation Type", ["User-Based", "Item-Based"])
+            n_items = st.number_input("Number of Recommendations", min_value=1, max_value=20, value=5, step=1)
 
-        # Submit button (only triggers when clicked)
-        search_button = st.form_submit_button("Search")
+            # Submit button (only triggers when clicked)
+            search_button = st.form_submit_button("Search")
 
-    # Main Page Output
-    st.title("Recommended Recipes")
-    if search_button and userid:
-        recommendations = getRecommendations(userid, filter_type, n_items)
-        display_recipes(recommendations, filter_type, userid)
-    else:
-        st.write("Enter a User ID and click Search to get recommendations.")
-
+        # Main Page Output
+        st.title("Recommended Recipes")
+        if search_button and userid:
+            recommendations = getRecommendations(userid, filter_type, n_items)
+            display_recipes(recommendations, filter_type, userid)
+        else:
+            st.write("Enter a User ID and click Search to get recommendations.")
+    except Exception as e:
+        st.error("Oops! Something went wrong.")

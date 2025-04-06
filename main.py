@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from data_loader import load_data
 import os
-import about, account, recipe_search, login, contact, home, admin
+import about, account, recipe_search, login, contact, home
 from styles import apply_styles
 from recipe_display import view_recipe_callback
 from footer import footer
@@ -29,25 +29,29 @@ columns_to_load = ['recipe_id', 'tags', 'name', 'minutes', 'n_steps', 'steps', '
 
 # Load datasets using the generalized function
 with st.spinner("Loading datasets..."):
-    #print("loading reviews_df in the main.py")
-    reviews_mod_time = os.path.getmtime('Data/reviews_df.feather')
-    recipes_mod_time = os.path.getmtime('Data/recipes_clean.feather')
-    user_pred_time = os.path.getmtime('Data/user_pred.feather')
-    item_pred_time = os.path.getmtime('Data/item_pred.feather')
+    try:
+        #print("loading reviews_df in the main.py")
+        reviews_mod_time = os.path.getmtime('Data/reviews_df.feather')
+        recipes_mod_time = os.path.getmtime('Data/recipes_clean.feather')
+        user_pred_time = os.path.getmtime('Data/user_pred.feather')
+        item_pred_time = os.path.getmtime('Data/item_pred.feather')
 
-    st.session_state.reviews_df = load_data('Data/reviews_df.feather', reviews_mod_time)
-    st.session_state.recipes_df = load_data('Data/recipes_clean.feather', recipes_mod_time, columns=columns_to_load)
-    st.session_state.user_pred_df = load_data('Data/user_pred.feather', user_pred_time)
-    st.session_state.item_pred_df = load_data('Data/item_pred.feather', item_pred_time)
+        st.session_state.reviews_df = load_data('Data/reviews_df.feather', reviews_mod_time)
+        st.session_state.recipes_df = load_data('Data/recipes_clean.feather', recipes_mod_time, columns=columns_to_load)
+        st.session_state.user_pred_df = load_data('Data/user_pred.feather', user_pred_time)
+        st.session_state.item_pred_df = load_data('Data/item_pred.feather', item_pred_time)
 
-    # Convert all columns (except 'user_id') to integers
-    st.session_state.user_pred_df.columns = [
-        int(col) if col != 'user_id' else col for col in st.session_state.user_pred_df.columns
-    ]
-    # Convert all columns (except 'user_id') to integers
-    st.session_state.item_pred_df.columns = [
-        int(col) if col != 'user_id' else col for col in st.session_state.item_pred_df.columns
-    ]
+        # Convert all columns (except 'user_id') to integers
+        st.session_state.user_pred_df.columns = [
+            int(col) if col != 'user_id' else col for col in st.session_state.user_pred_df.columns
+        ]
+        # Convert all columns (except 'user_id') to integers
+        st.session_state.item_pred_df.columns = [
+            int(col) if col != 'user_id' else col for col in st.session_state.item_pred_df.columns
+        ]
+    except Exception as e:
+        st.error("Failed to load data files. Please check your 'Data/' folder.")
+        #st.exception(e)
 
 # check if user is logged in
 if "logged_in" not in st.session_state:
@@ -126,15 +130,17 @@ if st.session_state.logged_in:
                 }
             }
         )
-        
-        if app == "Admin":
-            import admin
-            admin.app()
-        elif app == "recommendations":
-            import recipe_recommend
-            recipe_recommend.app()
-        elif app == "Account":
-            account.app()
+        try:
+            if app == "Admin":
+                import admin
+                admin.app()
+            elif app == "recommendations":
+                import recipe_recommend
+                recipe_recommend.app()
+            elif app == "Account":
+                account.app()
+        except Exception as e:
+            st.error("An unexpected error occured.")
     else:
         # Track previous page
         if 'previous_page' not in st.session_state:
@@ -185,26 +191,32 @@ if st.session_state.logged_in:
                 }
             }
         )
+        try:
+            # Detect page change
+            if st.session_state.previous_page != app:
+                view_recipe_callback(None, False)
+                st.session_state.previous_page = app
 
-        # Detect page change
-        if st.session_state.previous_page != app:
-            view_recipe_callback(None, False)
-            st.session_state.previous_page = app
-        
-        # navigate to the desired page
-        if app == "Home":
-            home.app()
-        elif app == "Search":
-            recipe_search.app()
-        elif app == "Account":
-            account.app()
-        elif app== "About Us":
-            about.app()
-        elif app=="Contact Us":
-            contact.app()
+            # navigate to the desired page
+            if app == "Home":
+                home.app()
+            elif app == "Search":
+                recipe_search.app()
+            elif app == "Account":
+                account.app()
+            elif app== "About Us":
+                about.app()
+            elif app=="Contact Us":
+                contact.app()
+        except Exception as e:
+            st.error("An unexpected error occured.")
     footer()
     
 else:
-    apply_styles()
-    login.app()
-    footer()
+    try:
+        apply_styles()
+        login.app()
+        footer()
+    except Exception as e:
+        st.error("Something went wrong. Please refresh the page or try again later.")
+        st.exception(e)
