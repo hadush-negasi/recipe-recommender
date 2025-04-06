@@ -1,19 +1,34 @@
 import streamlit as st
-from streamlit_extras.card import card
 from streamlit_extras.stylable_container import stylable_container
 import firebase_admin
 from firebase_admin import firestore, credentials
 from datetime import datetime
-import pandas as pd
+import os
 import json
+from dotenv import load_dotenv
+
+# Load environment variables from .env (for local use)
+load_dotenv()
 
 # Check if Firebase is already initialized
 if not firebase_admin._apps:
-    # Load secret Firebase credentials from Streamlit secrets
-    firebase_json = st.secrets["FIREBASE_CREDENTIALS"]
-    cred = credentials.Certificate(json.loads(firebase_json))
-    firebase_admin.initialize_app(cred)
+    try:
+        # 1️ Try .env first (Local)
+        firebase_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
+        if firebase_path:
+            cred = credentials.Certificate(firebase_path)
+        # 2️ Fallback to Streamlit Secrets (Cloud)
+        elif "FIREBASE_CREDENTIALS" in st.secrets:  # Only runs on Cloud
+            cred = credentials.Certificate(json.loads(st.secrets["FIREBASE_CREDENTIALS"]))
+        else:
+            raise ValueError("Firebase credentials missing in both .env and secrets")
+        
+        firebase_admin.initialize_app(cred)
+    except Exception as e:
+        st.error(f"🔥 Firebase init failed: {e}")
+        st.stop()
     
+# Initialize Firestore and get API key
 db = firestore.client()
 
 def logout_callback():

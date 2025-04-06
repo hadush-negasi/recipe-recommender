@@ -5,7 +5,6 @@ import os
 import about, account, recipe_search, login, contact, home, admin
 from styles import apply_styles
 from recipe_display import view_recipe_callback
-from streamlit_extras.bottom_container import bottom
 from footer import footer
 # app configuration
 st.set_page_config(
@@ -74,7 +73,7 @@ hide_menu_style = """
     </style>
 """
 # Inject the CSS into the app
-st.markdown(hide_menu_style, unsafe_allow_html=True)
+#st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 #if logged in, show the side bar with the option menu
 if st.session_state.logged_in:
@@ -84,9 +83,7 @@ if st.session_state.logged_in:
     del st.session_state.signup_successful
 
     apply_styles()
-    # Controlled-height footer
-    #with bottom():
-    #    st.markdown("© 2025 RecipeRecommender", unsafe_allow_html=True)
+    
     # Different menu for admin vs regular users
     if st.session_state.user_role == "admin":
         app = option_menu(

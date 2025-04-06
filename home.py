@@ -149,8 +149,8 @@ def app():
         st.session_state.rec_choice = choice
         st.rerun()
     # function to handle return to options 
-    def handle_options_btn():
-        st.session_state.rec_choice = None
+    def handle_options_btn(choice):
+        st.session_state.rec_choice = choice
 
     # Only show cards if no choice has been made yet
     if st.session_state.rec_choice is None:
@@ -422,12 +422,90 @@ def app():
     )
     # Display recommendations based on selection
     if st.session_state.rec_choice:
-        # If User-Based or Item-Based is selected but no recommendations exist, show a warning
+        # If the user has not rated any item show warning
         if st.session_state.rec_choice == "User-Based" and not has_user_based:
-            st.warning("⚠️ You have not rated enough recipes to receive personalized recommendations.")
+            col1, col2 = st.columns([3,1])
+            with col1:
+                st.markdown("""
+                <style>
+                    .modern-warning {
+                        border-left: 4px solid #FFA500;
+                        background-color: #FFF8E6;
+                        padding: 1em;
+                        border-radius: 0px 8px 8px 0px;
+                        margin: 1em 0;
+                    }
+                    .suggestion-item {
+                        margin: 0.5em 0;
+                        padding-left: 1em;
+                        border-left: 2px solid #4CAF50;
+                    }
+                    .rec-header {
+                        color: #2E86AB;
+                        font-weight: 600;
+                        margin-bottom: 0.5em;
+                    }
+                </style>             
+                <div class="modern-warning">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <span style="font-size: 1.5em;">⚠️</span>
+                        <span class="rec-header">Personalized Recommendations Locked</span>
+                    </div>
+                    <p>We need at least <strong>10 ratings</strong> to understand your unique taste profile.</p>
+                    <div style="margin-top: 16px;">
+                        <p style="font-weight: 500; margin-bottom: 8px;">Try these instead:</p>
+                        <div class="suggestion-item">Rate 10+ recipes to unlock your personalized recommendations</div>
+                        <div class="suggestion-item">Try our <strong>Popular Recipes</strong> - loved by most users</div>
+                        <div class="suggestion-item">Browse by <strong>Ingredients</strong> or <strong>Cooking Time</strong></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                st.button("Show Popular Recipes", type="primary", on_click=handle_options_btn, args=("Popular",))
+            with col2:
+                st.button("← Back to Recommendation Options",type="secondary", on_click=handle_options_btn, args=(None,))            
             return
-        if st.session_state.rec_choice == "Item_Based" and not has_item_based:
-            st.warning("⚠️ No similar recipes available. Try rating some recipes first!")
+
+        # Item-Based Recommendations
+        if st.session_state.rec_choice == "Item-Based" and not has_item_based:
+            col1,col2 = st.columns([2,1])
+            with col1:
+                st.markdown("""
+                <style>
+                    .modern-warning {
+                        border-left: 4px solid #4285F4;
+                        background-color: #E8F0FE;
+                        padding: 1em;
+                        border-radius: 0px 8px 8px 0px;
+                        margin: 1em 0;
+                    }
+                    .suggestion-item {
+                        margin: 0.5em 0;
+                        padding-left: 1em;
+                        border-left: 2px solid #EA4335;
+                    }
+                    .rec-header {
+                        color: #4285F4;
+                        font-weight: 600;
+                        margin-bottom: 0.5em;
+                    }
+                </style>
+                <div class="modern-warning">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <span style="font-size: 1.5em;">🔍</span>
+                        <span class="rec-header">Help Us Find Similar Recipes</span>
+                    </div>
+                    <p>Rate 5-10 recipes (especially ones you like) to get better recommendations.</p>
+                    <div style="margin-top: 16px;">
+                        <p style="font-weight: 500; margin-bottom: 8px;">Quick suggestions:</p>
+                        <div class="suggestion-item">Rate recipes similar to what you enjoy</div>
+                        <div class="suggestion-item">Try our <strong>Popular Recipes</strong></div>
+                        <div class="suggestion-item">Browse by <strong>Ingredients</strong> or <strong>Cooking Time</strong></div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                st.button("Try Popular Recipes", type="primary", on_click=handle_options_btn, args=("Popular",))
+            with col2:
+                st.button("← Back to Recommendation Options", type="secondary", on_click=handle_options_btn, args=(None,))
             return
         
         if has_user_based:
@@ -460,7 +538,7 @@ def app():
                 st.header(f":blue[{header_text}]")
             with header_col2:
                 # Add a back button to show cards again
-                st.button("← Back to Recommendation Options", on_click=handle_options_btn)
+                st.button("← Back to Recommendation Options", on_click=handle_options_btn, args=(None,))
 
             st.subheader(f":green[{subheader_text}]")
             with st.spinner("Loading recommended recipes..."):            
