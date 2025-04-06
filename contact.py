@@ -103,7 +103,7 @@ def app():
     with st.form("contact_form"):
         name = st.text_input("Name", key="name", value=name, disabled=True)
         email = st.text_input("Email", key="email", value=email, disabled=True)
-        message = st.text_area(key="message", placeholder="Write your message here...")
+        message = st.text_area(label="message",key="message", placeholder="Write your message here...")
         submitted = st.form_submit_button("Submit")
 
     # Step 2: On submit, inject values into JS and run AJAX
