@@ -1,7 +1,6 @@
 import streamlit as st
 from streamlit_extras.card import card
-import requests
-from email_validator import validate_email, EmailNotValidError
+import streamlit.components.v1 as components
 
 def app():
     # ---- Hero Section ----
@@ -93,73 +92,62 @@ def app():
             }
         )
 
-    user_name = st.session_state.user_data.get("name", "John Doe")
-    user_email = st.session_state.user_data.get("email", "you@email.com")
+    name = st.session_state.user_data.get("name", "John Doe")
+    email = st.session_state.user_data.get("email", "you@email.com")
+    if "message_submitted" not in st.session_state:
+        st.session_state.message_submitted = False 
 
     # ---- Contact Form ----
     st.markdown("---")
     st.subheader("📩 Send Us a Message")
+    with st.form("contact_form"):
+        name = st.text_input("Name", key="name", value=name, disabled=True)
+        email = st.text_input("Email", key="email", value=email, disabled=True)
+        message = st.text_area(key="message", placeholder="Write your message here...")
+        submitted = st.form_submit_button("Submit")
 
-    form_html = f"""
-    <style>
-    .contact-container {{
-        display: flex;
-        justify-content: flex-start;
-        padding: 0 5%;
-    }}
-
-    .contact-form {{
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 12px;
-        max-width: 500px;
-        width: 100%;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }}
-    .contact-form input, .contact-form textarea {{
-        width: 100%;
-        padding: 10px;
-        margin-top: 8px;
-        margin-bottom: 16px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-sizing: border-box;
-        font-size: 14px;
-    }}
-    .contact-form button {{
-        background-color: #4CAF50;
-        color: white;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 16px;
-    }}
-    .contact-form button:hover {{
-        background-color: #45a049;
-    }}
-    </style>
-
-    <div class="contact-container">
-        <div class="contact-form">        
-            <form action="https://formsubmit.co/c927f1508df2319903fe889d7857844a" method="POST">
-                <label>Your Name*</label><br>
-                <input type="text" name="name" value="{user_name}" readonly><br>
-                <label>Your Email*</label><br>
-                <input type="email" name="email" value="{user_email}" readonly><br>
-                <label>Your Message*</label><br>
-                <textarea name="message" rows="6" required placeholder="Write your message here..."></textarea><br>
-                <input type="hidden" name="_captcha" value="false">
-                <input type="hidden" name="_template" value="table">
-                <input type="hidden" name="_subject" value="New Contact Form Submission">
-                <input type="hidden" name="_autoresponse" value="Thanks for contacting us! We'll get back to you shortly.">
-                <button type="submit">Send Message</button>
-            </form>
-        </div>
-    </div>
-    """
-
-    st.markdown(form_html, unsafe_allow_html=True)
+    # Step 2: On submit, inject values into JS and run AJAX
+    if submitted:
+        if message.strip() == "":
+            st.warning("Please enter your message before submitting.")
+        elif st.session_state["message_submitted"]:
+            st.info("You've already submitted your message") # limit it to one message per session
+        else:
+            st.session_state["message_submitted"] = True  # Lock future submissions
+            components.html(
+                f"""
+                <div id="response-msg" style="margin:10px 0; font-weight:600; color:green;"></div>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                const resBox = document.getElementById("response-msg");
+                $.ajax({{
+                    method: 'POST',
+                    url: 'https://formsubmit.co/ajax/c927f1508df2319903fe889d7857844a',
+                    dataType: 'json',
+                    accepts: 'application/json',
+                    data: {{
+                        name: "{name}",
+                        email: "{email}",
+                        message: `{message}`,
+                        _captcha: "false",
+                        _template: "table",
+                        _subject: "New Contact Form Submission"
+                    }},
+                    success: function(data) {{
+                        resBox.style.color = "green";
+                        resBox.innerText = "✅ Your message has been sent successfully!";
+                        console.log(data);
+                    }},
+                    error: function(err) {{
+                        resBox.style.color = "red";
+                        resBox.innerText = "❌ Failed to send your message. Please try again.";
+                        console.log(err);
+                    }}
+                }});
+                </script>
+                """,
+                height=70,
+            )
            
     # ---- Map Embed ----
     st.markdown("---")
