@@ -77,7 +77,7 @@ hide_menu_style = """
     </style>
 """
 # Inject the CSS into the app
-#st.markdown(hide_menu_style, unsafe_allow_html=True)
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 #if logged in, show the side bar with the option menu
 if st.session_state.logged_in:
