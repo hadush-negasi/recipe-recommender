@@ -97,12 +97,12 @@ A recipe recommendation system that helps users discover new dishes based on the
 ---
 
 ### 📋 Recipe Recommendations  
-![Recommendations](screenshots/recommendation_view.png)
+![Recommendations](screenshots/recommendation-view.png)
 
 ---
 
 ### 🍽️ Full Recipe Details with Feedback Form  
-![Recipe Details](screenshots/recipe_detail.png)
+![Recipe Details](screenshots/recipe-detail.png)
 
 ---
 
@@ -112,7 +112,7 @@ A recipe recommendation system that helps users discover new dishes based on the
 ---
 
 ### 👤 Account Page (Edit Profile)  
-![Account Edit](screenshots/account_edit.png)
+![Account Edit](screenshots/account-edit.png)
 
 ## Technologies Used
 
