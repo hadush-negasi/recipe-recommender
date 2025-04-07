@@ -83,16 +83,16 @@ A recipe recommendation system that helps users discover new dishes based on the
      - 👤 **Account** (view/edit profile)  
 
 ## Screenshots
-
-### 🔐 Login Page  
-![Login Page](screenshots/login.png)
-
----
-
 ### 🏠 Home Page with Recommendation Options  
 ![Home Page](screenshots/homepage1.png)  
 ![Home Page](screenshots/homepage2.png)  
 ![Home Page](screenshots/homepage3.png)
+
+---
+
+
+### 🔐 Login Page  
+![Login Page](screenshots/login.png)
 
 ---
 
