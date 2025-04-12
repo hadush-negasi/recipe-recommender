@@ -168,7 +168,7 @@ def app():
         with social_cols[1]:
             st.markdown("[![Instagram](https://img.icons8.com/color/48/000000/instagram-new.png)](https://www.instagram.com/hadush_negasii/profilecard/?igsh=MWYzanpmaGZnNGFkcA==)")
         with social_cols[2]:
-            st.markdown("[![LinkedIn](https://img.icons8.com/color/48/000000/linkedin.png)](https://linkedin.com)")
+            st.markdown("[![LinkedIn](https://img.icons8.com/color/48/000000/linkedin.png)](https://linkedin.com/in/hadush-brhane)")
         with social_cols[3]:
             st.markdown("[![Facebook](https://img.icons8.com/color/48/000000/facebook-new.png)](https://facebook.com)")
     except Exception as e:

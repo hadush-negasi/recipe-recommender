@@ -69,6 +69,10 @@ def footer():
                         <i class="fab fa-instagram"></i>
                     </a>
 
+                    <a href="https://www.linkedin.com/in/hadush-brhane" aria-label="Linkedin" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+
                 </div>
                 <div class="footer-copyright">
                     © 2025 RecipeFinder | By Hadush Negasi

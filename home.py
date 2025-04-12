@@ -418,12 +418,12 @@ def app():
 
         has_user_based = (
             "user_pred_df" in st.session_state 
-            and not st.session_state.user_pred_df.empty
+            and (st.session_state.user_pred_df is not None)
             and user_id in st.session_state.user_pred_df['user_id'].values
         )
         has_item_based = (
             "item_pred_df" in st.session_state 
-            and not st.session_state.item_pred_df.empty
+            and (st.session_state.item_pred_df is not None)
             and user_id in st.session_state.item_pred_df['user_id'].values
         )
         # Display recommendations based on selection
@@ -514,10 +514,10 @@ def app():
                     st.button("← Back to Recommendation Options", type="secondary", on_click=handle_options_btn, args=(None,))
                 return
 
-            if has_user_based:
+            if st.session_state.rec_choice == "User-Based":
                 header_text = "✨ Your Personalized Recommendations"
                 subheader_text = "Recipes we think you'll love based on your preferences!"
-            elif has_item_based:
+            elif st.session_state.rec_choice == "Item-Based":
                 header_text = "🔍 Recipes Similar to Your Favorites"
                 subheader_text = "Discover recipes similar to the ones you've liked!"
             else:

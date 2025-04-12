@@ -1,8 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from data_loader import load_data
+from data_loader import load_data, load_user_predictions
 import os
-import about, account, recipe_search, login, contact, home
+import about, account, recipe_search, login, contact, home, admin, recipe_recommend
 from styles import apply_styles
 from recipe_display import view_recipe_callback
 from footer import footer
@@ -38,17 +38,6 @@ with st.spinner("Loading datasets..."):
 
         st.session_state.reviews_df = load_data('Data/reviews_df.feather', reviews_mod_time)
         st.session_state.recipes_df = load_data('Data/recipes_clean.feather', recipes_mod_time, columns=columns_to_load)
-        st.session_state.user_pred_df = load_data('Data/user_pred.feather', user_pred_time)
-        st.session_state.item_pred_df = load_data('Data/item_pred.feather', item_pred_time)
-
-        # Convert all columns (except 'user_id') to integers
-        st.session_state.user_pred_df.columns = [
-            int(col) if col != 'user_id' else col for col in st.session_state.user_pred_df.columns
-        ]
-        # Convert all columns (except 'user_id') to integers
-        st.session_state.item_pred_df.columns = [
-            int(col) if col != 'user_id' else col for col in st.session_state.item_pred_df.columns
-        ]
     except Exception as e:
         st.error("Failed to load data files. Please check your 'Data/' folder.")
         #st.exception(e)
@@ -76,8 +65,8 @@ hide_menu_style = """
     .block-container {padding-top: 0px !important;}
     </style>
 """
-# Inject the CSS into the app
-st.markdown(hide_menu_style, unsafe_allow_html=True)
+# Inject the CSS into the app to hide top bar from streamlit
+#st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 #if logged in, show the side bar with the option menu
 if st.session_state.logged_in:
@@ -90,6 +79,19 @@ if st.session_state.logged_in:
     
     # Different menu for admin vs regular users
     if st.session_state.user_role == "admin":
+        try:
+            st.session_state.user_pred_df = load_data('Data/user_pred.feather', user_pred_time)
+            st.session_state.item_pred_df = load_data('Data/item_pred.feather', item_pred_time)
+            # Convert all columns (except 'user_id') to integers
+            st.session_state.user_pred_df.columns = [
+                int(col) if col != 'user_id' else col for col in st.session_state.user_pred_df.columns
+            ]
+            # Convert all columns (except 'user_id') to integers
+            st.session_state.item_pred_df.columns = [
+                int(col) if col != 'user_id' else col for col in st.session_state.item_pred_df.columns
+            ]
+        except Exception as e:
+            st.error("Oops.. couldn't load data. Something happended. please check your 'Data/' folder")
         app = option_menu(
             menu_title=None,
             options=["Admin","recommendations", "Account"],
@@ -132,16 +134,31 @@ if st.session_state.logged_in:
         )
         try:
             if app == "Admin":
-                import admin
                 admin.app()
             elif app == "recommendations":
-                import recipe_recommend
                 recipe_recommend.app()
             elif app == "Account":
                 account.app()
         except Exception as e:
             st.error("An unexpected error occured.")
     else:
+        try:
+            st.session_state.user_pred_df = load_user_predictions(st.session_state.user_data.get('user_id', None), 'Data/user_pred.feather', user_pred_time)
+            st.session_state.item_pred_df = load_user_predictions(st.session_state.user_data.get('user_id', None), 'Data/item_pred.feather', item_pred_time)
+            
+            if st.session_state.user_pred_df is not None:
+                # Convert all columns (except 'user_id') to integers
+                st.session_state.user_pred_df.columns = [
+                    int(col) if col != 'user_id' else col for col in st.session_state.user_pred_df.columns
+                ]
+            if st.session_state.item_pred_df is not None:
+                # Convert all columns (except 'user_id') to integers
+                st.session_state.item_pred_df.columns = [
+                    int(col) if col != 'user_id' else col for col in st.session_state.item_pred_df.columns
+                ]
+        except Exception as e:
+            st.error("Oops... couldn't load user prediction data. please check your 'Data/' folder")
+            st.error(e)
         # Track previous page
         if 'previous_page' not in st.session_state:
             st.session_state.previous_page = None
