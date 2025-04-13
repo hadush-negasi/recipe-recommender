@@ -230,9 +230,63 @@ if st.session_state.logged_in:
     footer()
     
 else:
+    # if user is not logged in, show popular recipes and login/signup page
+    apply_styles()
     try:
-        apply_styles()
-        login.app()
+        # Define the navigation menu with icons and styles
+        app = option_menu(
+            menu_title=None,  # No title
+            options=["Home", "About Us", "Login/SignUp"],  # Menu items
+            icons=["house", "info-circle", "person"],  # Icons for each menu item
+            default_index=0,  # Default selected tab
+            orientation="horizontal",  # Horizontal layout
+            styles={  
+                "container": {
+                    "padding": "5px",
+                    "background-color": "#f9f9f9",
+                    "border-bottom": "1px solid #e0e0e0",  # Subtle bottom border
+                    "box-shadow": "0 2px 5px rgba(0,0,0,0.05)",  # Soft shadow
+                    "margin-bottom": "10px"  # Space below navbar
+                },
+                "icon": {
+                    "color": "#2e8b57",  # Changed to nature-themed green
+                    "font-size": "18px",
+                    "margin-right": "5px"  # Space between icon and text
+                },
+                "nav-link": {
+                    "font-size": "16px",
+                    "text-align": "center",
+                    "margin": "5px",
+                    "padding": "8px 12px",
+                    "border-radius": "5px",
+                    "color": "#495057",
+                    "transition": "all 0.3s ease"
+                },
+                "nav-link:hover": {  # Hover effect
+                    "background-color": "#e9ecef",
+                    "color": "#2e8b57"
+                },
+                "nav-link-selected": {
+                    "background-color": "#2e8b57",
+                    "color": "white",
+                    "font-weight": "500",
+                    "box-shadow": "0 2px 5px rgba(46, 139, 87, 0.2)"
+                }
+            }
+        )
+        st.title(":green[Welcome to Recipe Recommender System].")
+        st.subheader(":red[Please Login/signup to get more personalized recommendations].")
+        try:
+            # navigate to the desired page
+            if app == "Home":
+                home.app()
+            elif app== "About Us":
+                about.app()
+            elif app=="Login/SignUp":
+                login.app()
+        except Exception as e:
+            st.error("An unexpected error occured.")
+        st.subheader(":blue[Please Login/signup to get more personalized recommendations].")
         footer()
     except Exception as e:
         st.error("Something went wrong. Please refresh the page or try again later.")

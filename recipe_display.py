@@ -82,12 +82,15 @@ def show_recipe_description(recipe):
 
         # Check if the user has already rated this recipe
         user_has_rated = False
-        user_id = st.session_state.user_data.get('user_id')
-        # Check if the user has rated this recipe
-        user_has_rated = not reviews_df[
-            (reviews_df['user_id'] == user_id) & 
-            (reviews_df['recipe_id'] == recipe['recipe_id'])
-        ].empty
+        if st.session_state.logged_in:
+            user_id = st.session_state.user_data.get('user_id')
+            # Check if the user has rated this recipe
+            user_has_rated = not reviews_df[
+                (reviews_df['user_id'] == user_id) & 
+                (reviews_df['recipe_id'] == recipe['recipe_id'])
+            ].empty
+        else:
+            user_has_rated = False
         
         if not user_has_rated:
             # Use a form to collect feedback
@@ -104,23 +107,26 @@ def show_recipe_description(recipe):
                 # Submit button for the form
                 submit = st.form_submit_button("Submit Feedback")
             if submit:
-                if feedback_rating is None:
-                    st.error("⚠️ Please select a rating before submitting your feedback.")
+                if not st.session_state.logged_in:
+                    st.info("Please login to Submit feedback.")
                 else:
-                    feedback_rating = feedback_rating + 1
-                    #print("feedback_rating: ", feedback_rating)
-                    #print("feedback comment: ", feedback_comment)
-                    # Append feedback to reviews_df
-                    new_review = {
-                        'user_id': user_id,  # Assign the new user_id
-                        'recipe_id': recipe['recipe_id'],
-                        'rating': feedback_rating,
-                    }
-                    reviews_df.loc[len(reviews_df)] = new_review
-                    #st.write(new_review)
-                    # Save the updated reviews_df to the feather file
-                    reviews_df.to_feather('Data/reviews_df.feather')
-                    st.success("Thank you for your feedback! 🎉")
+                    if feedback_rating is None:
+                        st.error("⚠️ Please select a rating before submitting your feedback.")
+                    else:
+                        feedback_rating = feedback_rating + 1
+                        #print("feedback_rating: ", feedback_rating)
+                        #print("feedback comment: ", feedback_comment)
+                        # Append feedback to reviews_df
+                        new_review = {
+                            'user_id': user_id,  # Assign the new user_id
+                            'recipe_id': recipe['recipe_id'],
+                            'rating': feedback_rating,
+                        }
+                        reviews_df.loc[len(reviews_df)] = new_review
+                        #st.write(new_review)
+                        # Save the updated reviews_df to the feather file
+                        reviews_df.to_feather('Data/reviews_df.feather')
+                        st.success("Thank you for your feedback! 🎉")
         else:
             st.info("You've already rated this recipe. Thank you! 🎉")
     #print(f"Time taken show selected recipe: {time.time() - start_time:.2f} seconds")

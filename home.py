@@ -11,7 +11,8 @@ from recipe_recommend import getRecommendations
 def get_recipes(personalized="Popular"):
     reviews_df = st.session_state.reviews_df
     recipes_df = st.session_state.recipes_df
-    user_id = st.session_state.user_data.get('user_id')
+    if st.session_state.logged_in:
+        user_id = st.session_state.user_data.get('user_id')
     recommended_recipes = None
     # Calculate popularity metrics
     recipe_stats = reviews_df.groupby('recipe_id').agg(
@@ -35,8 +36,9 @@ def get_recipes(personalized="Popular"):
         # Ensure the order matches recommendations dict
         recommended_recipes = recommended_recipes.set_index('recipe_id').reindex(recommended_recipe_ids).reset_index()
     elif personalized=="Popular":
-        recipes_rated = reviews_df[reviews_df['user_id'] == user_id]['recipe_id'].unique()
-        recommended_recipes = recommended_recipes[~recommended_recipes['recipe_id'].isin(recipes_rated)]
+        if st.session_state.logged_in:  # if user is logged in only show those recipes which have not been rated
+            recipes_rated = reviews_df[reviews_df['user_id'] == user_id]['recipe_id'].unique()
+            recommended_recipes = recommended_recipes[~recommended_recipes['recipe_id'].isin(recipes_rated)]
         recommended_recipes = recommended_recipes.sort_values(by='popularity_score', ascending=False).drop(columns=['popularity_score']).head(15)
     else:
         st.error("invalid recommedation type, please select, User-Based, Item-Based or Popular")
@@ -138,7 +140,8 @@ def show_recipes(recommended_recipes):
 def app():
     try:   
         # Check for personalized recommendations
-        user_id = st.session_state.user_data.get('user_id')
+        if st.session_state.logged_in:
+            user_id = st.session_state.user_data.get('user_id')
         recommended_recipes = None
 
         if "show_description" not in st.session_state:
@@ -157,9 +160,13 @@ def app():
         # function to handle return to options 
         def handle_options_btn(choice):
             st.session_state.rec_choice = choice
+        
+        # if user is not logged in default the choice to popular recipes
+        if not st.session_state.logged_in:
+            st.session_state.rec_choice = "Popular"
 
         # Only show cards if no choice has been made yet
-        if st.session_state.rec_choice is None:
+        if st.session_state.logged_in and (st.session_state.rec_choice is None):
             # Hero Section
             st.markdown(
                 f"""
@@ -521,8 +528,11 @@ def app():
                 header_text = "🔍 Recipes Similar to Your Favorites"
                 subheader_text = "Discover recipes similar to the ones you've liked!"
             else:
-                user_name = st.session_state.user_data.get('name', '')
-                header_text = f"👋 {user_name} Welcome! Check Out Popular Recipes"
+                if st.session_state.logged_in:
+                    user_name = st.session_state.user_data.get('name', '')
+                    header_text = f"👋 {user_name} Welcome! Check Out Popular Recipes"
+                else:
+                    header_text = f"👋 Welcome! Check Out Popular Recipes"
                 subheader_text = "Not sure what to cook? Here are some of the most-loved recipes!"
 
             recommended_recipes = get_recipes(personalized=st.session_state.rec_choice)
@@ -544,11 +554,13 @@ def app():
                 with header_col1:
                     st.header(f":blue[{header_text}]")
                 with header_col2:
-                    # Add a back button to show cards again
-                    st.button("← Back to Recommendation Options", on_click=handle_options_btn, args=(None,))
+                    if st.session_state.logged_in:
+                        # Add a back button to show cards again
+                        st.button("← Back to Recommendation Options", on_click=handle_options_btn, args=(None,))
 
                 st.subheader(f":green[{subheader_text}]")
                 with st.spinner("Loading recommended recipes..."):            
                     show_recipes(recommended_recipes)
     except Exception as e:
         st.error("Oops! Something went wrong.")
+        st.exception(e)

@@ -42,16 +42,16 @@ db = firestore.client()
 def app():
     try:
         reviews_df = st.session_state.reviews_df
-        st.markdown(
-            """
-            <style>
-            .block-container {
-                padding-top: 0rem !important;
-            }
-            </style>
-            """, 
-            unsafe_allow_html=True
-        )
+        #st.markdown(
+        #    """
+        #    <style>
+        #    .block-container {
+        #        padding-top: 0rem !important;
+        #    }
+        #    </style>
+        #    """, 
+        #    unsafe_allow_html=True
+        #)
 
         # Initialize error variables if they don't exist
         if 'login_errors' not in st.session_state:
@@ -169,6 +169,9 @@ def app():
                             del st.session_state.email_login
                             del st.session_state.password_login
                             del st.session_state.signup_successful
+                            # clean up session variable recommendation choice like popular recipes choice from the defalut home page
+                            if "rec_choice" in st.session_state:
+                                st.session_state.rec_choice = None
                         else:
                             st.session_state.login_response_error ="Invalid Email or Password! Please enter valid email and password"
                     except requests.exceptions.ConnectionError:
@@ -302,7 +305,7 @@ def app():
 
             log_col1,log_col2,log_col3 = st.columns([1, 2, 1])
             with log_col2:
-                st.title("Welcome to Recipe Recommendation System.")
+                #st.title("Welcome to Recipe Recommendation System.")
                 login_tab, signup_tab = st.tabs(["Login", "Sign Up"])
                 # with login tab
                 with login_tab:
