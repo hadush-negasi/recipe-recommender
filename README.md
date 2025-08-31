@@ -4,8 +4,7 @@ A recipe recommendation system that helps users discover new dishes based on the
 
 ## 🚀 Demo
 
-Check out the live demo here:  
-[Recipe Recommender App](https://hadush7501-recipe-recommender.hf.space/)
+Check out the live demo here: [Demo Link](https://hadush7501-recipe-recommender.hf.space/)
 
 ## Table of Contents
 - [Features](#features)
