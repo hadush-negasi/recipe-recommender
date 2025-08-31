@@ -2,6 +2,11 @@
 
 A recipe recommendation system that helps users discover new dishes based on their available ingredients and preferences using collaborative or content-based filtering.
 
+## 🚀 Demo
+
+Check out the live demo here:  
+[Recipe Recommender App](https://hadush7501-recipe-recommender.hf.space/)
+
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
